@@ -1,0 +1,25 @@
+# <?xml version="1.0"?>
+#   <response version="3.0" protocol="wmp" type="submit">
+#   <error code="2" description="Message successfully queued." resolution=""/>
+#   <ticket id="4413W-1125E-1417T-24J4E" transmit="1" 
+#           price="0.072" total="0.072" fee="0.072" pin="+16123816295"/>
+# </response>
+ 
+class SmsController < ApplicationController
+  skip_before_filter :verify_authenticity_token
+  respond_to :xml
+
+  def create
+    xml = Nokogiri::XML::Builder.new do |xml|
+            xml.response      version: '3.0', protocol: 'wmp', type: 'submit' do
+              xml.error       code: '2', description: 'Message successfully queued.'
+              xml.ticket      id: '123456'
+            end
+          end
+
+    puts "RECEIVED: #{params.inspect}"
+    respond_to do |format|
+      format.xml { render xml: xml }
+    end
+  end
+end
