@@ -1,0 +1,35 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Phone number:</strong>
+  <%= @phone.phone_number %>
+</p>
+
+<p>
+  <strong>Phone carrier:</strong>
+  <%= @phone.phone_carrier %>
+</p>
+
+<table>
+  <% @phone.messages.each do |message| %>
+    <tr>
+      <td><%= message.created_at %></td>
+      <% if message.source == "local" %>
+        <td> --&gt; </td>
+      <% else %>
+        <td> &lt;-- </td>
+      <% end %>
+      <td><%= message.content %></td>
+    </tr>
+  <% end %>
+</table>
+
+<p>Enter message to send</p>
+
+<%= form_for [@phone, @message] do |f| %>
+  <%= f.text_field :content %>
+  <%= f.submit %>
+<% end %>
+
+<%= link_to 'Edit', edit_phone_path(@phone) %> |
+<%= link_to 'Back', phones_path %>

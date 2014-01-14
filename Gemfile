@@ -10,6 +10,7 @@ gem 'sqlite3'
 gem 'sass-rails', '~> 4.0.0'
 
 gem 'nokogiri'
+gem 'rest-client'
 gem 'actionpack-xml_parser'
 
 # Use Uglifier as compressor for JavaScript assets

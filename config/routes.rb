@@ -6,6 +6,9 @@ OpenMarketMock::Application.routes.draw do
   # root 'welcome#index'
 
   resources :sms
+  resources :phones do
+    resources :messages, only: [:create]
+  end
 
   # Example of regular route:
   #   get 'products/:id' => 'catalog#view'

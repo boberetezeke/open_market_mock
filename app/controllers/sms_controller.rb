@@ -10,6 +10,17 @@ class SmsController < ApplicationController
   respond_to :xml
 
   def create
+    source_phone_number = params[:request][:source][:address]
+    dest_phone_number   = params[:request][:destination][:address]
+    dest_carrier        = params[:request][:destination][:carrier]
+    message = params[:request][:message][:text]
+
+    phone = Phone.find_by_phone_number(dest_phone_number)
+    if !phone
+      phone = Phone.create(phone_number: dest_phone_number, phone_carrier: dest_carrier)
+    end
+    phone.messages << Message.new(content: message, source: 'remote')
+
     xml = Nokogiri::XML::Builder.new do |xml|
             xml.response      version: '3.0', protocol: 'wmp', type: 'submit' do
               xml.error       code: '2', description: 'Message successfully queued.'
