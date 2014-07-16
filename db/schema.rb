@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20140113162822) do
+ActiveRecord::Schema.define(version: 20140128165748) do
 
   create_table "messages", force: true do |t|
     t.string   "content"
@@ -24,6 +24,7 @@ ActiveRecord::Schema.define(version: 20140113162822) do
   create_table "phones", force: true do |t|
     t.string "phone_number"
     t.string "phone_carrier"
+    t.text   "notes"
   end
 
 end

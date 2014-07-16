@@ -10,6 +10,7 @@ class SmsController < ApplicationController
   respond_to :xml
 
   def create
+    puts "**** in create *************************"
     source_phone_number = params[:request][:source][:address]
     dest_phone_number   = params[:request][:destination][:address]
     dest_carrier        = params[:request][:destination][:carrier]
@@ -19,7 +20,12 @@ class SmsController < ApplicationController
     if !phone
       phone = Phone.create(phone_number: dest_phone_number, phone_carrier: dest_carrier)
     end
-    phone.messages << Message.new(content: message, source: 'remote')
+    message = Message.new(content: message, source: 'remote')
+    message.save
+    phone.messages << message
+
+    puts "**** should raise exception #{message.id}" if message.id % 2 == 0
+    raise Exception if message.id % 2 == 0
 
     xml = Nokogiri::XML::Builder.new do |xml|
             xml.response      version: '3.0', protocol: 'wmp', type: 'submit' do

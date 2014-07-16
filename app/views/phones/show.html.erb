@@ -10,6 +10,15 @@
   <%= @phone.phone_carrier %>
 </p>
 
+<% if @phone.notes.present? %>
+  <p>
+    <strong>Notes:</strong>
+    <%= @phone.notes %>
+  </p>
+<% end %>
+
+<%= link_to "clear messages", clear_messages_phone_path(@phone), method: 'put' %>
+
 <table>
   <% @phone.messages.each do |message| %>
     <tr>
@@ -27,8 +36,16 @@
 <p>Enter message to send</p>
 
 <%= form_for [@phone, @message] do |f| %>
-  <%= f.text_field :content %>
-  <%= f.submit %>
+  <div>
+    <%= f.text_field :content %>
+  </div>
+  <div>
+    <%= check_box_tag 'use_mms' %>
+    <%= label_tag "use MMS" %>
+  </div>
+  <div>
+    <%= f.submit %>
+  </div>
 <% end %>
 
 <%= link_to 'Edit', edit_phone_path(@phone) %> |

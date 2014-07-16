@@ -22,6 +22,12 @@ class PhonesController < ApplicationController
   def edit
   end
 
+  def clear_messages
+    @phone = Phone.find(params[:id])
+    @phone.messages.destroy_all
+    redirect_to @phone
+  end
+
   # POST /phones
   # POST /phones.json
   def create
@@ -70,6 +76,6 @@ class PhonesController < ApplicationController
 
     # Never trust parameters from the scary internet, only allow the white list through.
     def phone_params
-      params.require(:phone).permit(:phone_number, :phone_carrier)
+      params.require(:phone).permit(:phone_number, :phone_carrier, :notes)
     end
 end

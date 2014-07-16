@@ -7,6 +7,9 @@ OpenMarketMock::Application.routes.draw do
 
   resources :sms
   resources :phones do
+    member do
+      put :clear_messages
+    end
     resources :messages, only: [:create]
   end
 
