@@ -5,9 +5,10 @@ class MessagesController < ApplicationController
     @message.phone = Phone.find(params[:phone_id])
     @message.save
 
-    if params[:use_mms] 
-      url = "http://localhost:3010/api/v2/sms/open_market/mms" 
-      data = receive_mms_data(@message.phone.phone_number, @message.phone.phone_carrier, @message.content)
+    if params[:image].present? 
+      #url = "http://localhost:3000/api/v2/sms/open_market/mms" 
+      url = "http://localhost:3000/cosoa/services/mmsMessagingService"
+      data = receive_mms_data(@message.phone.phone_number, @message.phone.phone_carrier, @message.content, params[:image])
       #puts "data = #{data}"
       begin 
         RestClient.post(url, data, "Content-Type" => "multipart/related; start=\"soap-start\"; type=\"text/xml\"; boundary=\"----=_Part_400406_2002992991.1390260809098\"", 'X-OpenMarket-Carrier-Id' => @message.phone.phone_carrier)
@@ -17,8 +18,15 @@ class MessagesController < ApplicationController
         #puts "backtrace: " + e.backtrace.join("\n")
       end
     else
-      url = "http://localhost:3010/api/v2/sms/open_market/sms" 
-      RestClient.post(url, xml: receive_sms_xml(@message.phone.phone_number, @message.phone.phone_carrier, @message.content).to_xml)
+      #url = "https://stage.citizenobserver.com/api/v2/sms/open_market/sms" 
+      url = "http://localhost:3000/api/v2/sms/open_market/sms" 
+      #url = "http://localhost:3000/cosoa/app/ezsmsreceive.jsp"
+      #url = "https://www.citizenobserver.com/cosoa/app/ezsmsreceive.jsp"
+puts "****** @message.content = #{@message.content}"
+      xml = receive_sms_xml(@message.phone.phone_number, @message.phone.phone_carrier, @message.content).to_xml
+puts "****** @message.content(xml) = #{xml}"
+      #RestClient::Request.execute(url: url, method: :post, verify_ssl: false)
+      RestClient.post(url, xml: xml)
     end
 
     redirect_to @message.phone
@@ -31,7 +39,8 @@ class MessagesController < ApplicationController
   end
 
   def receive_sms_xml(source_phone_number, source_phone_carrier, text)
-    data = text.gsub(/(.)/) { "%2.2x" % $1.ord }
+    data = text.gsub(/(.)/m) { "%2.2x" % $1.ord }
+    #data = "050003ce0401737470343131205020494e464f20202020696e666f726d6174696f6e206f6e2061207375737065637420696e766f6c76656420696e206120686f6d6520696e766173696f6e2079657374657264617920617420333530332062656c6c65207465727261636520492063757272656e746c79205345454e2074686520737573706563742077697468206b6e6f776e2032206c6170746f7020616e"
     puts "text = #{text}"
     puts "data = #{data}"
     Nokogiri::XML::Builder.new do |xml|
@@ -90,7 +99,7 @@ class MessagesController < ApplicationController
             end
             xml.Recipients do
               xml.To do
-                xml.Number '11234567890'
+                xml.ShortCode '11234567890'
               end
             end
             xml.TimeStamp '2014-01-20T23:33:28.670Z'
@@ -102,7 +111,7 @@ class MessagesController < ApplicationController
     end
   end
 
-  def receive_mms_data(source_phone_number, source_phone_carrier, message_text)
+  def receive_mms_data(source_phone_number, source_phone_carrier, message_text, image_name)
     xml = receive_mms_xml(source_phone_number, source_phone_carrier).to_xml
     puts("xml = #{xml}")
     "------=_Part_400406_2002992991.1390260809098\r\n" +
@@ -122,11 +131,11 @@ class MessagesController < ApplicationController
     message_text +
     "\r\n" + 
     "------=_Part_400407_349549365.1390260809098\r\n" +
-    "Content-Type: image/jpeg\r\n" +
+    "Content-Type: #{(image_name =~ /mov$/) ? 'video/quicktime' : 'image/jpeg'}\r\n" +
     "Content-Transfer-Encoding: binary\r\n" + 
     "Content-ID: IMG_7243.jpg\r\n" +
     "\r\n" + 
-    File.read("#{Rails.root}/flower-tiny.jpg", encoding: 'ascii-8bit') +
+    File.read("#{Rails.root}/#{image_name}", encoding: 'ascii-8bit') +
     "\r\n" + 
     "------=_Part_400407_349549365.1390260809098\r\n" +
     "\r\n" + 

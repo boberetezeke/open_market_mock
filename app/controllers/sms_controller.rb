@@ -24,8 +24,8 @@ class SmsController < ApplicationController
     message.save
     phone.messages << message
 
-    puts "**** should raise exception #{message.id}" if message.id % 2 == 0
-    raise Exception if message.id % 2 == 0
+    #puts "**** should raise exception #{message.id}" if message.id % 2 == 0
+    #raise Exception if message.id % 2 == 0
 
     xml = Nokogiri::XML::Builder.new do |xml|
             xml.response      version: '3.0', protocol: 'wmp', type: 'submit' do

@@ -37,12 +37,13 @@
 
 <%= form_for [@phone, @message] do |f| %>
   <div>
-    <%= f.text_field :content %>
+    <%= f.text_area :content, rows: 3, cols: 40 %>
   </div>
   <div>
-    <%= check_box_tag 'use_mms' %>
-    <%= label_tag "use MMS" %>
+    <%= label_tag 'Attachment:' %>
+    <%= select_tag 'image', options_for_select(['', 'flower-tiny.jpg', 'adam.jpg', 'sample.mov']) %>
   </div>
+  <hr/>
   <div>
     <%= f.submit %>
   </div>
